@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+env
+
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+### Configure environment
+
+set -o errexit    # always exit on error
+set -o pipefail   # dont ignore exit codes when piping output
+unset GIT_DIR     # Avoid GIT_DIR leak from previous build steps
+
+### Configure directories
+
+mkdir -p $1 $2 $3 # Ensure dirs are present
+
+build_dir=$(cd $1 && pwd)
+cache_dir=$(cd $2 && pwd)
+env_dir=$(cd $3 && pwd)
+
+cd $build_dir
+
+APP=$(dirname $0)
+# CURRENT_URL="https://gigalixir.s3-us-west-2.amazonaws.com/slugs/development/hello_phoenix/CURRENT"
+# CURRENT=$(curl $CURRENT_URL)
+# CURRENT_VERSION=$(echo $CURRENT | cut -d '/' -f 3)
+# echo $CURRENT_VERSION
+# TMP_DIR=$(mktemp -d)
+# curl -o $TMP_DIR/$APP.tar.gz $CURRENT_URL/../../$CURRENT
+# pushd $TMP_DIR
+# tar zxvf $APP.tar.gz
+# popd
+# pushd rel
+# rm -rf $APP
+# mv $TMP_DIR $APP
+# popd
+# rm -rf $TMP_DIR
+# 
+# mix release --upgrade --upfrom=$CURRENT_VERSION
+# 
+# rm -rf rel/$APP/releases/$CURRENT_VERSION
+# 
+MIX_ENV=prod mix release --env prod
+DIRS=(`ls -Ad _build/prod/rel/*/`)
+echo $DIRS
+echo ${#DIRS[@]}
+if [ ${#DIRS[@]} -ne 1 ]; then
+  echo "Did not find exactly 1 directory under _build/prod/rel/."
+  exit 1;
+fi
+APP=`echo $DIRS | cut -d '/' -f 4`
+echo $APP
+DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
+echo $DIRS
+if [ ${#DIRS[@]} -ne 1 ]; then
+  echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
+  exit 1;
+fi
+VERSION=`echo $DIRS | cut -d '/' -f 6`
+echo $VERSION
+
+mkdir -p /tmp/cache/out
+cp _build/prod/rel/$APP/releases/$VERSION/$APP.tar.gz /tmp/cache/out/$APP-$VERSION.tar.gz
