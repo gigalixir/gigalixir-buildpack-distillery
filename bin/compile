@@ -20,8 +20,30 @@ env_dir=$(cd $3 && pwd)
 cd $build_dir
 
 if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
-  mix release --env prod --upgrade --upfrom=$GIGALIXIR_APP_VERSION
-  rm -rf _build/prod/rel/$APP/releases/$GIGALIXIR_APP_VERSION
+  # TODO: duplicated below
+  DIRS=(`ls -Ad _build/prod/rel/*/`)
+  echo $DIRS
+  echo ${#DIRS[@]}
+  if [ ${#DIRS[@]} -ne 1 ]; then
+    echo "Did not find exactly 1 directory under _build/prod/rel/."
+    exit 1;
+  fi
+  APP=`echo $DIRS | cut -d '/' -f 4`
+  echo $APP
+  DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
+  echo $DIRS
+  if [ ${#DIRS[@]} -ne 1 ]; then
+    echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
+    exit 1;
+  fi
+  VERSION=`echo $DIRS | cut -d '/' -f 6`
+  echo $VERSION
+
+
+  mix release --env prod --upgrade --upfrom=$CURRENT_VERSION
+
+  # remove current version so we know which is then new version to release.
+  rm -rf _build/prod/rel/$APP/releases/$CURRENT_VERSION
 else
   mix release --env prod
 fi
