@@ -22,9 +22,9 @@ cd $build_dir
 if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   # TODO: support hot upgrades
   APP=${GIGALIXIR_REPO:?"required"}
-  # APP=$(dirname $0)
   # CURRENT_URL="TODO"
   # CURRENT=$(curl $CURRENT_URL)
+  # CURRENT=$(gsutil cat gs://slug-bucket/development/$APP/CURRENT)
   # CURRENT_VERSION=$(echo $CURRENT | cut -d '/' -f 3)
   # echo $CURRENT_VERSION
   # TMP_DIR=$(mktemp -d)
@@ -42,7 +42,7 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   # 
   # rm -rf rel/$APP/releases/$CURRENT_VERSION
   # 
-  mix release --env prod --upgrade
+  mix release --env prod --upgrade --upfrom=$GIGALIXIR_APP_VERSION
 else
   mix release --env prod
 fi
