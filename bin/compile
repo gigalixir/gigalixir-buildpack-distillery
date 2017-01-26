@@ -19,9 +19,9 @@ env_dir=$(cd $3 && pwd)
 
 cd $build_dir
 
-if [ "$SHOULD_HOT_UPGRADE" = "true" ]; then
+if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   # TODO: support hot upgrades
-  APP=${GIGALIXIR_REPO:?"GIGALIXIR_REPO not set."}
+  APP=${GIGALIXIR_REPO:?"required"}
   # APP=$(dirname $0)
   # CURRENT_URL="TODO"
   # CURRENT=$(curl $CURRENT_URL)
