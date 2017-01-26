@@ -19,28 +19,33 @@ env_dir=$(cd $3 && pwd)
 
 cd $build_dir
 
-# TODO: support hot upgrades
-# APP=$(dirname $0)
-# CURRENT_URL="TODO"
-# CURRENT=$(curl $CURRENT_URL)
-# CURRENT_VERSION=$(echo $CURRENT | cut -d '/' -f 3)
-# echo $CURRENT_VERSION
-# TMP_DIR=$(mktemp -d)
-# curl -o $TMP_DIR/$APP.tar.gz $CURRENT_URL/../../$CURRENT
-# pushd $TMP_DIR
-# tar zxvf $APP.tar.gz
-# popd
-# pushd rel
-# rm -rf $APP
-# mv $TMP_DIR $APP
-# popd
-# rm -rf $TMP_DIR
-# 
-# mix release --upgrade --upfrom=$CURRENT_VERSION
-# 
-# rm -rf rel/$APP/releases/$CURRENT_VERSION
-# 
-mix release --env prod
+if [ "$SHOULD_HOT_UPGRADE" = "true" ]; then
+  # TODO: support hot upgrades
+  APP=${GIGALIXIR_REPO:?"GIGALIXIR_REPO not set."}
+  # APP=$(dirname $0)
+  # CURRENT_URL="TODO"
+  # CURRENT=$(curl $CURRENT_URL)
+  # CURRENT_VERSION=$(echo $CURRENT | cut -d '/' -f 3)
+  # echo $CURRENT_VERSION
+  # TMP_DIR=$(mktemp -d)
+  # curl -o $TMP_DIR/$APP.tar.gz $CURRENT_URL/../../$CURRENT
+  # pushd $TMP_DIR
+  # tar zxvf $APP.tar.gz
+  # popd
+  # pushd rel
+  # rm -rf $APP
+  # mv $TMP_DIR $APP
+  # popd
+  # rm -rf $TMP_DIR
+  # 
+  # mix release --upgrade --upfrom=$CURRENT_VERSION
+  # 
+  # rm -rf rel/$APP/releases/$CURRENT_VERSION
+  # 
+  mix release --env prod --upgrade
+else
+  mix release --env prod
+fi
 DIRS=(`ls -Ad _build/prod/rel/*/`)
 echo $DIRS
 echo ${#DIRS[@]}
