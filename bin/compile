@@ -66,4 +66,5 @@ VERSION=`echo $DIRS | cut -d '/' -f 6`
 echo $VERSION
 
 mkdir -p $cache_dir/out
+rm -f $cache_dir/out/*
 cp _build/prod/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSION.tar.gz
