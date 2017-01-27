@@ -57,7 +57,7 @@ fi
 APP=`echo $DIRS | cut -d '/' -f 4`
 echo $APP
 DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
-echo $DIRS
+echo "$DIRS"
 echo ${#DIRS[@]}
 if [ ${#DIRS[@]} -ne 1 ]; then
   echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
@@ -72,3 +72,6 @@ cp _build/prod/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSI
 
 # so it can be deleted outside of container
 chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
+
+# cleanup so it does not get cached
+rm -rf _build/prod/rel/$APP/releases/
