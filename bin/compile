@@ -40,10 +40,10 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   echo $VERSION
 
 
-  mix release --env prod --upgrade --upfrom=$CURRENT_VERSION
+  mix release --env prod --upgrade --upfrom=$VERSION
 
   # remove current version so we know which is then new version to release.
-  rm -rf _build/prod/rel/$APP/releases/$CURRENT_VERSION
+  rm -rf _build/prod/rel/$APP/releases/$VERSION
 else
   mix release --env prod
 fi
