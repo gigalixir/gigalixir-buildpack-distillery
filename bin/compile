@@ -20,8 +20,9 @@ env_dir=$(cd $3 && pwd)
 cd $build_dir
 
 if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
-  cp -r $cache_dir/in/_build .
-  rm -rf $cache_dir/in/_build
+  # well known dir.. would love to pass it in, but buildpack system doesn't do it for us.
+  cp -r /tmp/in/_build .
+  rm -rf /tmp/in/_build
 
   # TODO: duplicated below
   DIRS=(`ls -Ad _build/prod/rel/*/`)
