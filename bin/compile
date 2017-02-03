@@ -34,14 +34,13 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   APP=`echo $DIRS | cut -d '/' -f 4`
   echo $APP
   DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
-  echo $DIRS
+  echo "$DIRS"
   if [ ${#DIRS[@]} -ne 1 ]; then
     echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
     exit 1;
   fi
   VERSION=`echo $DIRS | cut -d '/' -f 6`
   echo $VERSION
-
 
   mix release --env prod --upgrade --upfrom=$VERSION
 
