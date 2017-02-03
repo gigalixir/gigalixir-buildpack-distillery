@@ -20,6 +20,9 @@ env_dir=$(cd $3 && pwd)
 cd $build_dir
 
 if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
+  cp -r $cache_dir/in/_build .
+  rm -rf $cache_dir/in/_build
+
   # TODO: duplicated below
   DIRS=(`ls -Ad _build/prod/rel/*/`)
   echo $DIRS
@@ -72,6 +75,3 @@ cp _build/prod/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSI
 
 # so it can be deleted outside of container
 chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
-
-# cleanup so it does not get cached
-rm -rf _build/prod/rel/$APP/releases/
