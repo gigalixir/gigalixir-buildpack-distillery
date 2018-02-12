@@ -13,7 +13,7 @@ mkdir -p $1 $2 $3 # Ensure dirs are present
 
 build_dir=$(cd $1 && pwd)
 cache_dir=$(cd $2 && pwd)
-env_dir=$(cd $3 && pwd)
+env_path=$(cd $3 && pwd)
 
 # copied from HashNuke/HashNuke/heroku-buildpack-elixir
 function export_env_vars() {
