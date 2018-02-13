@@ -13,7 +13,50 @@ mkdir -p $1 $2 $3 # Ensure dirs are present
 
 build_dir=$(cd $1 && pwd)
 cache_dir=$(cd $2 && pwd)
-env_dir=$(cd $3 && pwd)
+env_path=$(cd $3 && pwd)
+
+# copied from HashNuke/HashNuke/heroku-buildpack-elixir
+function export_env_vars() {
+  whitelist_regex=${2:-''}
+  blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+  if [ -d "$env_path" ]; then
+    output_section "Will export the following config vars:"
+    for e in $(ls $env_path); do
+      echo "$e" | grep -E "$whitelist_regex" | grep -vE "$blacklist_regex" &&
+      export "$e=$(cat $env_path/$e)"
+      :
+    done
+  fi
+}
+
+function export_mix_env() {
+  if [ -z "$MIX_ENV" ]; then
+    if [ -d $env_path ] && [ -f $env_path/MIX_ENV ]; then
+      export MIX_ENV=$(cat $env_path/MIX_ENV)
+    else
+      export MIX_ENV=${1:-prod}
+    fi
+  fi
+
+  output_line "* MIX_ENV=${MIX_ENV}"
+}
+
+function output_line() {
+  local spacing="      "
+  echo "${spacing} $1"
+}
+
+function output_section() {
+  local indentation="----->"
+  echo "${indentation} $1"
+}
+
+export_env_vars
+export_mix_env
+# end copy
+
+DEFAULT_RELEASE_OPTIONS="--env prod"
+RELEASE_OPTIONS=${GIGALIXIR_RELEASE_OPTIONS:-$DEFAULT_RELEASE_OPTIONS}
 
 cd $build_dir
 
@@ -35,12 +78,12 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   fi
   VERSION=`echo $DIRS | cut -d '/' -f 6`
 
-  mix release --env prod --upgrade --upfrom=$VERSION
+  mix release $RELEASE_OPTIONS --upgrade --upfrom=$VERSION
 
   # remove current version so we know which is then new version to release.
   rm -rf _build/prod/rel/$APP/releases/$VERSION
 else
-  mix release --env prod
+  mix release $RELEASE_OPTIONS
 fi
 DIRS=(`ls -Ad _build/prod/rel/*/`)
 if [ ${#DIRS[@]} -ne 1 ]; then
