@@ -71,7 +71,8 @@ load_config
 export_env_vars
 export_mix_env
 
-DEFAULT_RELEASE_OPTIONS="--env prod"
+RELEASE_ENV=${MIX_ENV:-prod}
+DEFAULT_RELEASE_OPTIONS="--env ${RELEASE_ENV}"
 RELEASE_OPTIONS=${GIGALIXIR_RELEASE_OPTIONS:-$DEFAULT_RELEASE_OPTIONS}
 
 cd $build_dir/$app_relative_path
@@ -81,15 +82,15 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   cp -r /tmp/in/_build .
 
   # TODO: duplicated below
-  DIRS=(`ls -Ad _build/prod/rel/*/`)
+  DIRS=(`ls -Ad _build/${RELEASE_ENV}/rel/*/`)
   if [ ${#DIRS[@]} -ne 1 ]; then
-    echo "Did not find exactly 1 directory under _build/prod/rel/."
+    echo "Did not find exactly 1 directory under _build/${RELEASE_ENV}/rel/."
     exit 1;
   fi
   APP=`echo $DIRS | cut -d '/' -f 4`
-  DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
+  DIRS=(`ls -Ad _build/${RELEASE_ENV}/rel/$APP/releases/*/`)
   if [ ${#DIRS[@]} -ne 1 ]; then
-    echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
+    echo "Did not find exactly 1 directory under _build/${RELEASE_ENV}/rel/$APP/releases/."
     exit 1;
   fi
   VERSION=`echo $DIRS | cut -d '/' -f 6`
@@ -97,26 +98,26 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   mix release $RELEASE_OPTIONS --upgrade --upfrom=$VERSION
 
   # remove current version so we know which is then new version to release.
-  rm -rf _build/prod/rel/$APP/releases/$VERSION
+  rm -rf _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION
 else
   mix release $RELEASE_OPTIONS
 fi
-DIRS=(`ls -Ad _build/prod/rel/*/`)
+DIRS=(`ls -Ad _build/${RELEASE_ENV}/rel/*/`)
 if [ ${#DIRS[@]} -ne 1 ]; then
-  echo "Did not find exactly 1 directory under _build/prod/rel/."
+  echo "Did not find exactly 1 directory under _build/${RELEASE_ENV}/rel/."
   exit 1;
 fi
 APP=`echo $DIRS | cut -d '/' -f 4`
-DIRS=(`ls -Ad _build/prod/rel/$APP/releases/*/`)
+DIRS=(`ls -Ad _build/${RELEASE_ENV}/rel/$APP/releases/*/`)
 if [ ${#DIRS[@]} -ne 1 ]; then
-  echo "Did not find exactly 1 directory under _build/prod/rel/$APP/releases/."
+  echo "Did not find exactly 1 directory under _build/${RELEASE_ENV}/rel/$APP/releases/."
   exit 1;
 fi
 VERSION=`echo $DIRS | cut -d '/' -f 6`
 
 mkdir -p $cache_dir/out
 rm -f $cache_dir/out/*
-cp _build/prod/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSION.tar.gz
+cp _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSION.tar.gz
 
 # so it can be deleted outside of container
 chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
