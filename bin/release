@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+cat <<EOF
+---
+addons:
+  []
+default_process_types:
+  web: /app/bin/$GIGALIXIR_APP_NAME $GIGALIXIR_COMMAND
+EOF
+
