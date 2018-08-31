@@ -121,3 +121,15 @@ cp _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$
 
 # so it can be deleted outside of container
 chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
+
+# determine capabilities of this slug
+# can eval run Elixir?
+RESULT=$(_build/${RELEASE_ENV}/rel/$APP/bin/$APP eval 'IO.inspect 123+123')
+if [ $? -eq 0 ]; then
+  if [ $RESULT -eq '246' ]; then
+    # success
+    echo '{"distillery": {"eval": "elixir"}}' > $cache_dir/out/capabilities
+  fi
+fi
+
+
