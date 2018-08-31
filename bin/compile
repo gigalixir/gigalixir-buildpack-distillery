@@ -127,7 +127,6 @@ chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
 output_section "Determining release capabilities"
 set +o errexit    # do not exit if there is an error
 RESULT=$(_build/${RELEASE_ENV}/rel/$APP/bin/$APP eval 'IO.inspect 123+123')
-set -o errexit    # always exit on error
 if [ $? -eq 0 ]; then
   if [ $RESULT -eq '246' ]; then
     # success. write out capabilities file. # capabilities file is gigalixir-only, heroku ignores.
@@ -136,5 +135,6 @@ if [ $? -eq 0 ]; then
     chmod +w $cache_dir/out/capabilities
   fi
 fi
+set -o errexit    # always exit on error
 
 
