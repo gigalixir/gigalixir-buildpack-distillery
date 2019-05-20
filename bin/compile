@@ -56,6 +56,17 @@ function export_mix_env() {
   output_line "* MIX_ENV=${MIX_ENV}"
 }
 
+function distillery_mix_release_command() {
+  set +o errexit    # do not exit if there is an error
+  mix help distillery.release >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo "distillery.release"
+  else
+    echo "release"
+  fi
+  set -o errexit    # always exit on error
+}
+
 function output_line() {
   local spacing="      "
   echo "${spacing} $1"
@@ -95,7 +106,8 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   fi
   VERSION=`echo $DIRS | cut -d '/' -f 6`
 
-  mix release $RELEASE_OPTIONS --upgrade --upfrom=$VERSION
+  RELEASE_CMD=$(distillery_mix_release_command)
+  mix $RELEASE_CMD $RELEASE_OPTIONS --upgrade --upfrom=$VERSION
 
   # remove current version so we know which is then new version to release.
   rm -rf _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION
