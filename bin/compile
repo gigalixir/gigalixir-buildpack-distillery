@@ -147,6 +147,7 @@ RESULT=$(_build/${RELEASE_ENV}/rel/$APP/bin/$APP eval 'IO.inspect 123+123' 2>&1)
 if [ $? -eq 0 ]; then
   if [ $RESULT -eq '246' ]; then
     # success. write out capabilities file. # capabilities file is gigalixir-only, heroku ignores.
+    output_line "eval supports elixir syntax"
     echo '{"distillery": {"eval": "elixir"}}' > $cache_dir/out/capabilities
     # so it can be deleted outside of container
     chmod +w $cache_dir/out/capabilities
