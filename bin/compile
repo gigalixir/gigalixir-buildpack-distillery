@@ -112,7 +112,8 @@ if [ "$GIGALIXIR_SHOULD_HOT_UPGRADE" = "true" ]; then
   # remove current version so we know which is then new version to release.
   rm -rf _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION
 else
-  mix release $RELEASE_OPTIONS
+  RELEASE_CMD=$(distillery_mix_release_command)
+  mix $RELEASE_CMD $RELEASE_OPTIONS
 fi
 DIRS=(`ls -Ad _build/${RELEASE_ENV}/rel/*/`)
 if [ ${#DIRS[@]} -ne 1 ]; then
