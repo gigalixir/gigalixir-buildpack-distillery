@@ -3,6 +3,8 @@
 
 ### Configure environment
 
+set -v
+
 set -o errexit    # always exit on error
 set -o pipefail   # dont ignore exit codes when piping output
 unset GIT_DIR     # Avoid GIT_DIR leak from previous build steps
@@ -130,16 +132,28 @@ VERSION=`echo $DIRS | cut -d '/' -f 6`
 
 mkdir -p _build/${RELEASE_ENV}/rel/$APP/.profile.d
 
-# heroku-buildpack-apt support
-if [ -d $build_dir/.apt ] && [ -f $build_dir/.profile.d/000_apt.sh ]; then
-  cp -r $build_dir/.apt _build/${RELEASE_ENV}/rel/$APP/.apt
-  cp $build_dir/.profile.d/000_apt.sh _build/${RELEASE_ENV}/rel/$APP/.profile.d/000_apt.sh
-fi
-
-# create tarball
 mkdir -p $cache_dir/out
 rm -f $cache_dir/out/*
 cp _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSION.tar.gz
+
+# heroku-buildpack-apt support
+if [ -d $build_dir/.apt ] && [ -f $build_dir/.profile.d/000_apt.sh ]; then
+  extracted_dir=$(mktemp -d)
+  tar -xzf "${cache_dir}/out/${APP}-${VERSION}.tar.gz" -C "${extracted_dir}"
+
+  # grab apt support files
+  cp -r "${build_dir}/.apt" "${extracted_dir}/.apt"
+  mkdir -p "${extracted_dir}/.profile.d"
+  cp "${build_dir}/.profile.d/000_apt.sh" "${extracted_dir}/.profile.d/000_apt.sh"
+
+  # allow custom Procfile
+  if [ -f "${build_dir}/Procfile" ]; then
+    cp "${build_dir}/Procfile" "${extracted_dir}/Procfile"
+  fi
+
+  # override the tarball
+  tar -czf "${cache_dir}/out/${APP}-${VERSION}.tar.gz" -C "${extracted_dir}" .
+fi
 
 # so it can be deleted outside of container
 chmod +w $cache_dir/out/$APP-$VERSION.tar.gz
