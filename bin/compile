@@ -128,6 +128,15 @@ if [ ${#DIRS[@]} -ne 1 ]; then
 fi
 VERSION=`echo $DIRS | cut -d '/' -f 6`
 
+mkdir -p _build/${RELEASE_ENV}/rel/$APP/.profile.d
+
+# heroku-buildpack-apt support
+if [ -d $build_dir/.apt ] && [ -f $build_dir/.profile.d/000_apt.sh ]; then
+  cp -r $build_dir/.apt _build/${RELEASE_ENV}/rel/$APP/.apt
+  cp $build_dir/.profile.d/000_apt.sh _build/${RELEASE_ENV}/rel/$APP/.profile.d/000_apt.sh
+fi
+
+# create tarball
 mkdir -p $cache_dir/out
 rm -f $cache_dir/out/*
 cp _build/${RELEASE_ENV}/rel/$APP/releases/$VERSION/$APP.tar.gz $cache_dir/out/$APP-$VERSION.tar.gz
